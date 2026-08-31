@@ -1,0 +1,11 @@
+# Linguist Language Detection Configuration
+*.json linguist-vendored
+*package-lock.json linguist-generated
+*.lock linguist-generated
+sample/*.json linguist-documentation
+
+# Treat source directories as primary languages
+frontend/**/*.tsx linguist-detectable=true
+frontend/**/*.ts linguist-detectable=true
+realtime-gateway/**/*.ts linguist-detectable=true
+core-service/**/*.java linguist-detectable=true
