@@ -1,0 +1,100 @@
+{
+  "traces": [
+    {
+      "traceId": "trace_sample_checkout_001",
+      "rootSpanId": "span_root_gw",
+      "rootServiceName": "api-gateway",
+      "name": "POST /api/v1/checkout",
+      "startTime": 1788159000000,
+      "endTime": 1788159001250,
+      "durationMs": 1250,
+      "statusCode": "ERROR",
+      "spans": [
+        {
+          "spanId": "span_root_gw",
+          "traceId": "trace_sample_checkout_001",
+          "serviceName": "api-gateway",
+          "name": "POST /api/v1/checkout",
+          "kind": "SERVER",
+          "startTime": 1788159000000,
+          "endTime": 1788159001250,
+          "durationMs": 1250,
+          "statusCode": "ERROR",
+          "httpMethod": "POST",
+          "httpStatusCode": 502
+        },
+        {
+          "spanId": "span_auth",
+          "traceId": "trace_sample_checkout_001",
+          "parentSpanId": "span_root_gw",
+          "serviceName": "auth-service",
+          "name": "POST /auth/verify",
+          "kind": "SERVER",
+          "startTime": 1788159000010,
+          "endTime": 1788159000045,
+          "durationMs": 35,
+          "statusCode": "OK",
+          "httpMethod": "POST",
+          "httpStatusCode": 200
+        },
+        {
+          "spanId": "span_order",
+          "traceId": "trace_sample_checkout_001",
+          "parentSpanId": "span_root_gw",
+          "serviceName": "order-service",
+          "name": "POST /orders/checkout",
+          "kind": "SERVER",
+          "startTime": 1788159000050,
+          "endTime": 1788159001240,
+          "durationMs": 1190,
+          "statusCode": "ERROR",
+          "httpMethod": "POST",
+          "httpStatusCode": 502
+        },
+        {
+          "spanId": "span_payment",
+          "traceId": "trace_sample_checkout_001",
+          "parentSpanId": "span_order",
+          "serviceName": "payment-gateway",
+          "name": "POST /payments/charge",
+          "kind": "SERVER",
+          "startTime": 1788159000090,
+          "endTime": 1788159001230,
+          "durationMs": 1140,
+          "statusCode": "ERROR",
+          "httpMethod": "POST",
+          "httpStatusCode": 500,
+          "statusMessage": "PSP Connection timeout: HikariPool-1 connection acquisition timeout (>30000ms)"
+        },
+        {
+          "spanId": "span_db",
+          "traceId": "trace_sample_checkout_001",
+          "parentSpanId": "span_payment",
+          "serviceName": "database-cluster",
+          "name": "SQL: SELECT * FROM payment_accounts",
+          "kind": "CLIENT",
+          "startTime": 1788159000100,
+          "endTime": 1788159000125,
+          "durationMs": 25,
+          "statusCode": "OK"
+        }
+      ]
+    }
+  ],
+  "logs": [
+    {
+      "serviceId": "payment-gateway",
+      "traceId": "trace_sample_checkout_001",
+      "level": "ERROR",
+      "message": "HikariPool-1 - Connection is not available, request timed out after 30002ms.",
+      "timestamp": 1788159001230
+    },
+    {
+      "serviceId": "order-service",
+      "traceId": "trace_sample_checkout_001",
+      "level": "WARN",
+      "message": "Payment gateway call failed with HTTP 500. Aborting checkout pipeline.",
+      "timestamp": 1788159001240
+    }
+  ]
+}

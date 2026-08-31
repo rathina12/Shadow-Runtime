@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # 1. PostgreSQL (Relational Data Tier: Users, Services, Incidents)
+  # -------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: shadow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shadow_db
+      POSTGRES_USER: shadow_user
+      POSTGRES_PASSWORD: shadow_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shadow_user -d shadow_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------
+  # 2. MongoDB (Telemetry Document Tier: Traces, Logs, Spans)
+  # -------------------------------------------------------------
+  mongodb:
+    image: mongo:7.0
+    container_name: shadow-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ["CMD","mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------
+  # 3. Redis (Cache, Pub/Sub, Chaos TTL Sessions)
+  # -------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: shadow-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------
+  # 4. Spring Boot Core Service (Auth, Registry, Incidents, Cost)
+  # -------------------------------------------------------------
+  core-service:
+    build:
+      context: ./core-service
+      dockerfile: Dockerfile
+    container_name: shadow-core-service
+    restart: unless-stopped
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shadow_db
+      SPRING_DATASOURCE_USERNAME: shadow_user
+      SPRING_DATASOURCE_PASSWORD: shadow_password
+      SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # -------------------------------------------------------------
+  # 5. Node.js Real-time Gateway (OTel Ingestion, Sockets, AI)
+  # -------------------------------------------------------------
+  realtime-gateway:
+    build:
+      context: ./realtime-gateway
+      dockerfile: Dockerfile
+    container_name: shadow-realtime-gateway
+    restart: unless-stopped
+    environment:
+      PORT: 4000
+      MONGO_URI: mongodb://mongodb:27017/shadow_telemetry
+      REDIS_URL: redis://redis:6379
+      CORE_SERVICE_URL: http://core-service:8080
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    ports:
+      - "4000:4000"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      core-service:
+        condition: service_started
+
+  # -------------------------------------------------------------
+  # 6. Next.js Frontend Dashboard (App Router, React Flow)
+  # -------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: shadow-frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_GATEWAY_URL: http://localhost:4000
+      NEXT_PUBLIC_CORE_URL: http://localhost:8080
+    ports:
+      - "3000:3000"
+    depends_on:
+      - realtime-gateway
+
+volumes:
+  pgdata:
+  mongodata:
+  redisdata:

@@ -1,0 +1,13 @@
+{
+  "name": "shadow-runtime-workspace",
+  "version": "1.0.0",
+  "description": "Shadow Runtime — AI Backend Execution Observability Platform",
+  "private": true,
+  "scripts": {
+    "dev:gateway": "cd realtime-gateway && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "test:gateway": "cd realtime-gateway && npm test",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down"
+  }
+}
