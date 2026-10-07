@@ -70,7 +70,7 @@ export default function DashboardPage() {
   return (
     <div className="sr-workspace min-h-screen text-slate-100">
       <Navbar onOpenAiDiagnosis={() => openAi()} onOpenChaos={() => openChaos()} />
-      <div className="flex min-h-[calc(100vh-4rem)]">
+      <div className="flex min-h-[calc(100vh-4rem)] flex-col lg:flex-row">
         <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} onOpenChaos={() => openChaos()} onOpenAiDiagnosis={() => openAi()} />
         <main id="main-content" className="min-w-0 flex-1 px-4 py-7 sm:px-7 xl:px-10">
           <div className="mx-auto max-w-[1600px] space-y-7">
