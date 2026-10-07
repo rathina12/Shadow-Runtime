@@ -116,3 +116,30 @@ mvn test
 - **Admin**: `admin` / `admin123` (Full RBAC controls, chaos injection, service mutations)
 - **Engineer**: `alex_dev` / `developer123` (Runbook execution, diagnosis)
 - **Viewer**: `viewer` / `viewer123` (Read-only monitoring)
+
+---
+
+## 🔭 Production AI Observability
+
+Shadow Runtime now observes its own AI endpoints in addition to backend service telemetry.
+
+### LLM signals
+- total calls and cache hits
+- success vs deterministic-fallback counts
+- average and P95 latency
+- estimated input/output token volume
+- per-operation model/source labels
+
+Endpoint:
+
+`GET /api/ai/metrics`
+
+The implementation is covered by Jest tests and a GitHub Actions pipeline that runs:
+- realtime gateway tests
+- TypeScript build
+- Spring Boot core-service tests
+
+The current CI pipeline is green for both the Node/TypeScript gateway and Java core service.
+
+See `docs/PRODUCTION_AI_HARDENING.md` for the next reliability steps.
+
