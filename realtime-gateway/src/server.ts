@@ -23,6 +23,7 @@ import {
   handleDiagnose,
   handleNlQuery,
   handleDraftRunbook,
+  handleLlmMetrics,
 } from './ai/aiController';
 
 // Chaos handlers
@@ -80,6 +81,7 @@ app.get('/api/telemetry/snapshots', handleGetSnapshots);
 app.post('/api/ai/diagnose', handleDiagnose);
 app.post('/api/ai/nl-query', handleNlQuery);
 app.post('/api/ai/draft-runbook', handleDraftRunbook);
+app.get('/api/ai/metrics', handleLlmMetrics);
 
 // Chaos Engineering routes
 app.post('/api/chaos/inject', handleInjectFault);
