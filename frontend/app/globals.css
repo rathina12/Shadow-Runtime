@@ -97,3 +97,55 @@ body {
 .react-flow__controls button:hover {
   background: #17223b !important;
 }
+
+
+/* Operations workspace refresh: readable hierarchy, restrained accents and consistent focus. */
+.sr-workspace {
+  background:
+    radial-gradient(ellipse 66% 38% at 55% -13%, rgba(35, 82, 152, 0.18), transparent 80%),
+    linear-gradient(160deg, #090e18 0%, #080d16 65%, #0a1220 100%);
+}
+.sr-panel {
+  border: 1px solid rgba(148, 163, 184, 0.13);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(22, 31, 47, .93), rgba(13, 21, 35, .93));
+  box-shadow: 0 12px 38px rgba(0, 0, 0, .12);
+}
+.sr-metric {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, .13);
+  border-radius: 18px;
+  padding: 19px 21px;
+  background: linear-gradient(145deg, rgba(23, 33, 51, .85), rgba(15, 23, 38, .85));
+  transition: border-color .18s, transform .18s;
+}
+.sr-metric:hover { border-color: rgba(125, 185, 235, .33); transform: translateY(-1px); }
+.sr-button-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(96, 165, 250, .35);
+  border-radius: 10px;
+  padding: 9px 13px;
+  background: rgba(56, 120, 210, .18);
+  color: #c2e3ff;
+  font-size: 12px;
+  font-weight: 600;
+  transition: background .18s;
+}
+.sr-button-primary:hover { background: rgba(56, 120, 210, .3); }
+.sr-sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+button:focus-visible, select:focus-visible, input:focus-visible {
+  outline: 2px solid #7dd3fc;
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+@media (max-width: 900px) {
+  .sr-metric { padding: 16px; }
+}
