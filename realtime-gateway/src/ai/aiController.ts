@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { GeminiOrchestrator } from './geminiOrchestrator';
+import { getLlmTelemetrySnapshot } from './llmTelemetry';
 
 const orchestrator = new GeminiOrchestrator();
 
@@ -39,4 +40,9 @@ export async function handleDraftRunbook(req: Request, res: Response): Promise<v
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
+}
+
+
+export async function handleLlmMetrics(_req: Request, res: Response): Promise<void> {
+  res.json(getLlmTelemetrySnapshot());
 }
