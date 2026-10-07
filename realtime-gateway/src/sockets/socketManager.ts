@@ -7,9 +7,9 @@ let io: SocketIOServer | null = null;
 export function initSocketServer(httpServer: HttpServer): SocketIOServer {
   io = new SocketIOServer(httpServer, {
     cors: {
-      origin: '*',
+      origin: config.corsOrigin === '*' ? '*' : config.corsOrigin.split(',').map(origin => origin.trim()),
       methods: ['GET', 'POST'],
-      credentials: true,
+      credentials: config.corsOrigin !== '*',
     },
   });
 
@@ -17,11 +17,15 @@ export function initSocketServer(httpServer: HttpServer): SocketIOServer {
     console.log(`🔌 Client connected to Shadow Runtime Socket.IO [ID: ${socket.id}]`);
 
     socket.on('join_room', (room: string) => {
+      // Rooms must not become an uncontrolled cross-tenant subscription primitive.
+      // Until authenticated tenant-scoped rooms exist, disallow arbitrary joins.
+      if (typeof room !== 'string' || !/^public:[a-zA-Z0-9_-]{1,64}$/.test(room)) return;
       socket.join(room);
       console.log(`Socket [${socket.id}] joined room: ${room}`);
     });
 
     socket.on('leave_room', (room: string) => {
+      if (typeof room !== 'string' || !/^public:[a-zA-Z0-9_-]{1,64}$/.test(room)) return;
       socket.leave(room);
     });
 

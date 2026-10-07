@@ -231,7 +231,9 @@ export const useTelemetryStore = create<TelemetryState>((set, get) => ({
         }
         set({ services: currentServices });
       }
-    } catch {}
+    } catch (error) {
+      console.error('Unable to refresh service topology:', error);
+    }
   },
 
   fetchTraces: async () => {
@@ -240,7 +242,9 @@ export const useTelemetryStore = create<TelemetryState>((set, get) => ({
       if (res.data && res.data.traces) {
         set({ recentTraces: res.data.traces });
       }
-    } catch {}
+    } catch (error) {
+      console.error('Unable to refresh recent traces:', error);
+    }
   },
 
   setSelectedService: (id) => set({ selectedServiceId: id }),
@@ -303,6 +307,11 @@ export const useTelemetryStore = create<TelemetryState>((set, get) => ({
 
   initSocketListeners: () => {
     const socket = getSocket();
+    // Prevent duplicate events when the dashboard remounts or React Strict Mode replays effects.
+    socket.removeAllListeners('connect');
+    socket.removeAllListeners('disconnect');
+    socket.removeAllListeners('trace_event');
+    set({ isLiveConnected: socket.connected });
 
     socket.on('connect', () => {
       set({ isLiveConnected: true });
@@ -314,7 +323,7 @@ export const useTelemetryStore = create<TelemetryState>((set, get) => ({
 
     socket.on('trace_event', (trace: any) => {
       set(state => {
-        const updated = [trace, ...state.recentTraces.slice(0, 40)];
+        const updated = [trace, ...state.recentTraces.filter(t => t.traceId !== trace.traceId).slice(0, 39)];
         const services = { ...state.services };
 
         if (trace.spans && Array.isArray(trace.spans)) {
