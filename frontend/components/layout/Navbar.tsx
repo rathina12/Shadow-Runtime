@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Activity, ShieldCheck, Zap, Sparkles, User, Radio, RefreshCw } from 'lucide-react';
+import { Activity, Zap, Sparkles } from 'lucide-react';
 import { useTelemetryStore } from '../../store/telemetryStore';
 import { useAuthStore } from '../../store/authStore';
 
@@ -10,7 +10,7 @@ export const Navbar: React.FC<{ onOpenAiDiagnosis: () => void; onOpenChaos: () =
   onOpenChaos,
 }) => {
   const { isLiveConnected, services, recentTraces } = useTelemetryStore();
-  const { user, switchRole } = useAuthStore();
+  const { user } = useAuthStore();
 
   const activeServicesList = Object.values(services);
   const criticalCount = activeServicesList.filter(s => s.status === 'CRITICAL').length;
@@ -62,7 +62,7 @@ export const Navbar: React.FC<{ onOpenAiDiagnosis: () => void; onOpenChaos: () =
 
         {/* Total Sampled Traces */}
         <div className="text-gray-400">
-          Traces Ingested: <span className="text-white font-bold">{recentTraces.length || 24}</span>
+          Traces Ingested: <span className="text-white font-bold">{recentTraces.length}</span>
         </div>
       </div>
 
@@ -86,22 +86,10 @@ export const Navbar: React.FC<{ onOpenAiDiagnosis: () => void; onOpenChaos: () =
           <span>Chaos Test</span>
         </button>
 
-        {/* RBAC Role Switcher */}
-        <div className="flex items-center gap-2 pl-3 border-l border-white/10 font-mono text-xs">
-          <div className="text-right hidden sm:block">
-            <div className="text-white font-bold text-[11px]">{user.username}</div>
-            <div className="text-[10px] text-cyber-cyan">{user.role.replace('ROLE_', '')}</div>
-          </div>
-          <select
-            value={user.role}
-            onChange={(e) => switchRole(e.target.value as any)}
-            className="bg-surface-50 border border-white/10 text-[11px] text-gray-300 rounded px-2 py-1 focus:outline-none"
-            title="Switch RBAC Role"
-          >
-            <option value="ROLE_ADMIN">Admin</option>
-            <option value="ROLE_ENGINEER">Engineer</option>
-            <option value="ROLE_VIEWER">Viewer</option>
-          </select>
+        {/* Display effective profile. Switching labels is not authentication or authorization. */}
+        <div className="hidden sm:block pl-3 border-l border-white/10 text-right font-mono text-xs">
+          <div className="text-white font-semibold text-[11px]">{user.username}</div>
+          <div className="text-[10px] text-cyber-cyan">{user.role.replace('ROLE_', '')} · demo profile</div>
         </div>
       </div>
     </header>
