@@ -11,7 +11,7 @@ services:
     environment:
       POSTGRES_DB: shadow_db
       POSTGRES_USER: shadow_user
-      POSTGRES_PASSWORD: shadow_password
+      POSTGRES_PASSWORD: ${SHADOW_POSTGRES_PASSWORD:?Set SHADOW_POSTGRES_PASSWORD in .env}
     ports:
       - "5432:5432"
     volumes:
@@ -68,10 +68,10 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/shadow_db
       SPRING_DATASOURCE_USERNAME: shadow_user
-      SPRING_DATASOURCE_PASSWORD: shadow_password
+      SPRING_DATASOURCE_PASSWORD: ${SHADOW_POSTGRES_PASSWORD:?Set SHADOW_POSTGRES_PASSWORD in .env}
       SPRING_DATASOURCE_DRIVER: org.postgresql.Driver
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
-      JWT_SECRET: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+      JWT_SECRET: ${SHADOW_JWT_SECRET:?Set SHADOW_JWT_SECRET in .env}
     ports:
       - "8080:8080"
     depends_on:
@@ -93,6 +93,7 @@ services:
       REDIS_URL: redis://redis:6379
       CORE_SERVICE_URL: http://core-service:8080
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      CORS_ORIGIN: ${SHADOW_CORS_ORIGIN:-http://localhost:3000}
     ports:
       - "4000:4000"
     depends_on:
